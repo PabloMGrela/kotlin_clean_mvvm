@@ -1,16 +1,34 @@
 package com.grela.clean.model
 
-import com.google.android.gms.maps.model.LatLng
-import com.grela.domain.model.CountryDomainEntity
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import com.grela.clean.Resource
+import com.grela.domain.DataResult
+import com.grela.domain.interactor.GetCountryUseCase
+import com.grela.domain.interactor.Invoker
+import com.grela.domain.interactor.UseCaseInvoker
 
-data class CountryViewModel(
-    val name: String,
-    val flag: String,
-    val continent: String,
-    val location: LatLng,
-    val leagues: List<LeagueViewModel>
-)
+class CountryViewModel(
+    private val invoker: Invoker,
+    private val getCountryUseCase: GetCountryUseCase
+) : ViewModel() {
+    private val _countryModels = MutableLiveData<Resource<List<CountryModel>>>()
 
-fun CountryDomainEntity.toCountryViewModel() = CountryViewModel(name, image, continent, LatLng(lat.toDouble(), lon.toDouble()), leagueWrapper.toLeagueViewModelList())
+    val countryModels: LiveData<Resource<List<CountryModel>>>
+        get() = _countryModels
 
-fun List<CountryDomainEntity>.toCountryViewModelList() = map { it.toCountryViewModel() }
+    fun load() {
+        invokeGetMovies()
+    }
+
+    private fun invokeGetMovies() {
+        _countryModels.value = Resource.loading()
+        invoker.execute(getCountryUseCase) {
+            when (it) {
+                is DataResult.Success -> _countryModels.value = Resource.success(it.r.toCountryModelList())
+                is DataResult.Error -> _countryModels.value = Resource.error(Error())
+            }
+        }
+    }
+}

@@ -4,13 +4,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.grela.clean.model.CountryViewModel
+import com.grela.clean.model.CountryModel
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.country_row.view.*
 import kotlinx.android.synthetic.main.title_row.view.*
 
 class CountryAdapter(
-    val itemClickListener: (CountryViewModel) -> Unit
+    val itemClickListener: (CountryModel) -> Unit
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     companion object {
@@ -22,9 +22,9 @@ class CountryAdapter(
         setHasStableIds(true)
     }
 
-    private var list = mutableListOf<CountryViewModel>()
+    private var list = mutableListOf<CountryModel>()
 
-    fun updateData(list: List<CountryViewModel>) {
+    fun updateData(list: List<CountryModel>) {
         this.list.clear()
         this.list.addAll(list)
         notifyDataSetChanged()
@@ -68,7 +68,7 @@ class CountryAdapter(
 
     inner class CountryViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
-        fun bind(data: CountryViewModel) {
+        fun bind(data: CountryModel) {
             with(itemView) {
                 countryName.text = data.name
                 setOnClickListener { itemClickListener(data) }

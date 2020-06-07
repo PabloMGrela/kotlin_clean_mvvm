@@ -7,7 +7,7 @@ import kotlin.coroutines.CoroutineContext
 
 open class CoroutineContextProvider {
     open val main: CoroutineContext by lazy { Dispatchers.Main }
-    open val background: CoroutineContext by lazy { Dispatchers.Default }
+    open val background: CoroutineContext by lazy { Dispatchers.IO }
 }
 
 class UseCaseInvoker(private val contextProvider: CoroutineContextProvider = CoroutineContextProvider(), private val idleNotifier: IdleNotifier? = null) : Invoker {
@@ -25,7 +25,7 @@ class UseCaseInvoker(private val contextProvider: CoroutineContextProvider = Cor
                 executeUseCase(useCase) {
                     result?.invoke(it as DataResult<*, T>)
                 }
-            } catch (ex: Exception){
+            } catch (ex: Exception) {
                 result?.invoke(DataResult.Error(Error(ex)))
             }
         }
@@ -57,7 +57,6 @@ class UseCaseInvoker(private val contextProvider: CoroutineContextProvider = Cor
         }
     }
 
-    @InternalCoroutinesApi
     private suspend fun executeUseCase(useCase: UseCase<*>, listener: (DataResult<*, *>) -> Unit) {
         val jobs = mutableListOf<Job>()
         jobs += GlobalScope.launch(kotlin.coroutines.coroutineContext + contextProvider.background, CoroutineStart.LAZY) {
